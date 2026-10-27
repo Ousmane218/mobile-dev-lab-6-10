@@ -1,56 +1,92 @@
-# Welcome to your Expo app 👋
+# Tic-Tac-Toe — Lab 10
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A mobile Tic-Tac-Toe application developed using React Native, Expo SDK 58, and Expo Router.
 
-## Get started
+The application allows two players to play Tic-Tac-Toe, revisit previous moves, and switch between light and dark themes.
 
-1. Install dependencies
+## Features
 
-   ```bash
-   npm install
-   ```
+- **Tic-Tac-Toe Game:** Interactive 3×3 board with alternating X and O turns, winner detection, and draw detection.
+- **Move History:** Players can revisit previous moves and continue playing from an earlier position.
+- **Drawer Navigation:** Three screens — Game, Settings, and About — accessible through the navigation drawer.
+- **Light and Dark Themes:** A switch in Settings updates the appearance of the entire application.
+- **React Context:** A shared theme provider maintains consistent appearance across screens.
+- **About Screen:** Displays the application name, version, and developer information.
+- **Drawer Icons:** Each navigation item has an icon that adapts to the current theme.
 
-2. Start the app
+## Screenshots
 
-   ```bash
-   npx expo start
-   ```
+### Light Mode
 
-In the output, you'll find options to open the app in a
+![Tic-Tac-Toe Light Mode](screenshots/game-light.png)
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### Dark Mode
 
-You can start developing by editing the files inside the **src/app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+![Tic-Tac-Toe Dark Mode](screenshots/game-dark.png)
 
-## Get a fresh project
+## Technologies Used
 
-When you're ready, run:
+- React Native
+- Expo SDK 58
+- Expo Router
+- TypeScript
+- React Context API
+- React Native Gesture Handler
+- React Native Reanimated
+- Expo Vector Icons
+
+## Getting Started
+
+**1. Clone the repository**
 
 ```bash
-npm run reset-project
+git clone <repository-url>
+cd tic-tac-toe
 ```
 
-This command will move the starter code to the **example** directory and create a blank **src/app** directory where you can start developing.
+Replace `<repository-url>` with the actual GitHub repository URL.
 
-### Other setup steps
+**2. Install dependencies**
 
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
+```bash
+npm install
+```
 
-## Learn more
+**3. Start the development server**
 
-To learn more about developing your project with Expo, look at the following resources:
+```bash
+npx expo start
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+**4. Run the application**
 
-## Join the community
+Scan the QR code using Expo Go on a compatible mobile device.
 
-Join our community of developers creating universal apps.
+## How to Use
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+1. Open Game and tap any empty square to place X or O.
+2. Continue playing until a player wins or the game ends in a draw.
+3. Use Move History to revisit earlier positions.
+4. Open the navigation drawer to access Settings or About.
+5. Enable or disable Dark Mode in Settings to change the application theme.
+
+## Project Structure
+
+```text
+src/
+├── app/
+│   ├── _layout.tsx
+│   ├── index.tsx
+│   ├── settings.tsx
+│   └── about.tsx
+└── context/
+    └── ThemeContext.tsx
+```
+
+## Author
+
+Ousmane Soumaré
+
+## Course
+
+Mobile Development — Lab 10: A Drawer and a Dark Theme for Tic-Tac-Toe.

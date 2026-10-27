@@ -1,98 +1,241 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { useState } from 'react';
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
+import { useAppTheme } from '../context/ThemeContext';
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
+type Player = 'X' | 'O';
+type Square = Player | null;
+
+export default function GameScreen() {
+
+  const { isDark } = useAppTheme();
+
+  const colors = {
+    background: isDark ? '#121212' : '#F5F5F5',
+    surface: isDark ? '#1E1E1E' : '#FFFFFF',
+    text: isDark ? '#FFFFFF' : '#171717',
+    border: isDark ? '#555555' : '#333333',
+    primary: isDark ? '#90CAF9' : '#1976D2',
+    x: isDark ? '#90CAF9' : '#1565C0',
+    o: isDark ? '#FFAB91' : '#D84315',
+  };
+
+  const [history, setHistory] = useState<Square[][]>([
+    Array(9).fill(null),
+  ]);
+
+  const [currentMove, setCurrentMove] = useState(0);
+
+  const squares = history[currentMove];
+  const xIsNext = currentMove % 2 === 0;
+
+  const winner = calculateWinner(squares);
+  const isDraw = !winner && squares.every(Boolean);
+
+  function handlePress(index: number) {
+    if (squares[index] || winner) return;
+
+    const nextSquares = [...squares];
+    nextSquares[index] = xIsNext ? 'X' : 'O';
+
+    const nextHistory = [
+      ...history.slice(0, currentMove + 1),
+      nextSquares,
+    ];
+
+    setHistory(nextHistory);
+    setCurrentMove(nextHistory.length - 1);
   }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
+
+  function jumpTo(move: number) {
+    setCurrentMove(move);
   }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
+
+  let status: string;
+
+  if (winner) {
+    status = `Winner: ${winner}`;
+  } else if (isDraw) {
+    status = "It's a draw!";
+  } else {
+    status = `Next player: ${xIsNext ? 'X' : 'O'}`;
+  }
+
+  
   return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
+    <ScrollView
+      style={{ backgroundColor: colors.background }}
+      contentContainerStyle={styles.container}
+    >
+      <Text style={[styles.heading, { color: colors.text }]}>
+        Tic-Tac-Toe
+      </Text>
+
+      <Text style={[styles.status, { color: colors.text }]}>
+        {status}
+      </Text>
+
+      <View style={styles.board}>
+        {squares.map((square, index) => (
+          <Pressable
+            key={index}
+            style={[
+              styles.square,
+              {
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
+              },
+            ]}
+            onPress={() => handlePress(index)}
+          >
+            <Text
+              style={[
+                styles.squareText,
+                {
+                  color:
+                    square === 'X'
+                      ? colors.x
+                      : square === 'O'
+                        ? colors.o
+                        : colors.text,
+                },
+              ]}
+            >
+              {square}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+
+      <Text
+        style={[
+          styles.historyTitle,
+          { color: colors.text },
+        ]}
+      >
+        Move History
+      </Text>
+
+      {history.map((_, move) => {
+        const isCurrent = move === currentMove;
+
+        return (
+          <Pressable
+            key={move}
+            style={[
+              styles.historyButton,
+              {
+                backgroundColor: isCurrent
+                  ? colors.primary
+                  : colors.surface,
+                borderColor: isCurrent
+                  ? colors.primary
+                  : colors.border,
+              },
+            ]}
+            onPress={() => jumpTo(move)}
+          >
+            <Text
+              style={[
+                styles.historyText,
+                {
+                  color: isCurrent
+                    ? colors.background
+                    : colors.text,
+                },
+              ]}
+            >
+              {move === 0
+                ? 'Go to game start'
+                : `Go to move #${move}`}
+              {isCurrent ? ' (Current)' : ''}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </ScrollView>
   );
+
 }
 
-export default function HomeScreen() {
-  return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
+function calculateWinner(squares: Square[]): Player | null {
+  const winningLines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
 
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
+  for (const [a, b, c] of winningLines) {
+    if (
+      squares[a] &&
+      squares[a] === squares[b] &&
+      squares[a] === squares[c]
+    ) {
+      return squares[a];
+    }
+  }
 
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
-
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
-  );
+  return null;
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
+    alignItems: 'center',
     justifyContent: 'center',
+    padding: 20,
+  },
+  heading: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  status: {
+    fontSize: 22,
+    marginBottom: 25,
+  },
+  board: {
+    width: 300,
     flexDirection: 'row',
+    flexWrap: 'wrap',
   },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
-  },
-  heroSection: {
+  square: {
+    width: 100,
+    height: 100,
+    borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
   },
-  title: {
-    textAlign: 'center',
+  squareText: {
+    fontSize: 48,
+    fontWeight: 'bold',
   },
-  code: {
-    textTransform: 'uppercase',
+  historyTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginTop: 30,
+    marginBottom: 15,
   },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
+  historyButton: {
+    padding: 10,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderRadius: 8,
+    minWidth: 200,
+    alignItems: 'center',
+  },
+  historyText: {
+    fontSize: 16,
   },
 });
